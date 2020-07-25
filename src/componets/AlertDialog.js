@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, Button } from '@material-ui/core';
 
-const LogoutDialog = (props) => {
+const AlertDialog = (props) => {
     return ( 
         <Dialog
         open={props.open}
@@ -10,19 +10,16 @@ const LogoutDialog = (props) => {
         aria-describedby="alert-dialog-description">
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    <h3>Are yout sure want to logout?</h3>
+                    <h3>{props.errorMessage}</h3>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.handleClose} color="primary">
-                    No
-                </Button>
-                <Button onClick={props.handleLogout} color="secondary">
-                    Yes, i wanna logout
+                <Button onClick={props.handleClose} color="secondary">
+                    Ok
                 </Button>
             </DialogActions>
         </Dialog>
      );
 }
  
-export default LogoutDialog;
+export default AlertDialog;

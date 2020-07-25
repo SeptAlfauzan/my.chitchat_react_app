@@ -9,10 +9,8 @@ import {
 } from "react-router-dom";
 import Signin from './pages/Signin';
 import Main from './pages/Main';
-import { useState } from 'react';
 import RegisterForm from './componets/RegisterForm';
-import dotenv from 'dotenv';
-dotenv.config();
+import AvatarForm from './componets/AvatarForm';
 
 
 
@@ -33,6 +31,7 @@ function App() {
           <Route exact path="/signin" component={Signin}/>
           <Route exact path="/signup" component={RegisterForm}/>
           <Route exact path="/404" component={NotFound}/>
+          <Route exact path="/upload/profile_pic" component={AvatarForm}/>
           <Redirect to="/404"/>
         </Switch>
       </Router>

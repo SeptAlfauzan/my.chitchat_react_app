@@ -1,22 +1,10 @@
 import React, {useState} from 'react';
-import { Link } from 'react-router-dom';
-
-import { Button, CssBaseline, TextField, Grid, Box, Typography, makeStyles, Container, Input } from '@material-ui/core';
+import { useForm } from 'react-hook-form';
+import { Button, CssBaseline, Grid, Typography, makeStyles, Container} from '@material-ui/core';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
-
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import AlertDialog from './AlertDialog';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,22 +30,53 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AvatarForm = (props)=>{
-  const [avatar, setAvatar] = useState(true);
-
+  
+  const [imageEror, setImageError] = useState('');
+  const [open, setOpen] = useState(false);
+  
+  const {register, handleSubmit} = useForm();
+  
+  const handleClose = () => {
+    // handleclose dialog box 
+    setOpen(false)
+  }
   const classes = useStyles();
-
-  console.log(props);
+  
   const handleBack = () => {
+    // handle to previous form
       props.prevStep();
   }
-  const handleSubmit = (e) => {
-    //   props.nextStep();
-    console.log(e.target.input);
-      e.preventDefault();
+
+  const handleSubmited = (data) => {
+    setImageError('');
+    if (data.profile.length>0) {
+      const file = new FormData();
+      const imageFile = data.profile[0];
+      file.append('file', imageFile);
+      // upload image to API
+      fetch(process.env.REACT_APP_API_UPLOAD_AVATAR, 
+      {
+        method: 'POST',
+        body: file
+      }).then(response => response.json()).then(result => {
+        // handle image upload error
+        if (result.image_error) {
+          setImageError('Image size too large, min 2mb');
+          // image size too large
+          setOpen(true)
+          // trigger alert dialog
+        }
+        console.log(result);
+      }).catch(err=>console.log(err));
+      //   props.nextStep();
+    }else{
+      console.log('no image');
+    }
   }
 
   const handleOnchange = (e)=>{
-    if(e.target.files[0] != undefined){
+    if(e.target.files[0] !== undefined){
+      console.log(e.target.files[0]);
       const imageUrl = window.URL.createObjectURL(e.target.files[0]);
       const addImageIcon = document.getElementById('icon-picture');
       const imageContainer = document.getElementById('output');
@@ -74,19 +93,21 @@ const AvatarForm = (props)=>{
       <CssBaseline />
       <div className={classes.paper}>
 
-      <Button variant="contained"
-      component="label" className={classes.avatar}>
-          <img id="output" src="" className="avatar-picture hidden"/>
-          <AddAPhotoIcon id="icon-picture" color="disabled" style={{ fontSize:90 }} />
-          <input onChange={handleOnchange}
-            type="file"
-            style={{ display: "none" }} accept="image/png, image/jpeg" />
-        </Button>            
-        <Typography component="h1" variant="h5">
-          Upload your profile picture
-        </Typography>
-        <form onSubmit={handleSubmit} className={classes.form} noValidate>
-          <Grid container spacing={2}>
+      <form onSubmit={handleSubmit((data) => handleSubmited(data))} className={classes.form} noValidate>
+      <Grid container spacing={2}>
+        <Grid item xs={12} className={classes.paper}>
+          <Button variant="contained"
+          component="label" className={classes.avatar}>
+            <img id="output" src="" alt="avatar" className="avatar-picture hidden"/>
+            <AddAPhotoIcon id="icon-picture" color="disabled" style={{ fontSize:90 }} />
+            <input ref={register} onChange={handleOnchange}
+              type="file"
+              style={{ display: "none" }} name="profile" accept="image/png, image/jpeg" />
+          </Button>            
+          <Typography component="h1" variant="h5">
+            Upload your profile picture
+          </Typography>
+        </Grid>
             <Grid item xs={12}>
               <p style={{textAlign: 'center'}} >you can skip this step</p>
             </Grid>
@@ -112,6 +133,7 @@ const AvatarForm = (props)=>{
           </Grid>
         </form>
       </div>
+      <AlertDialog handleClose={handleClose} open={open} errorMessage={imageEror} />
     </Container>
   );
 }
