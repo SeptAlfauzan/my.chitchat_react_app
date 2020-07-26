@@ -4,6 +4,7 @@ import { Button, CssBaseline, Grid, Typography, makeStyles, Container} from '@ma
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import AlertDialog from './AlertDialog';
 import dotenv from 'dotenv';
+import { useHistory } from 'react-router-dom';
 dotenv.config();
 
 const useStyles = makeStyles((theme) => ({
@@ -30,15 +31,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AvatarForm = (props)=>{
+  // console.log('get data from props', props.values);
+  // console.log(props.values.profile_pic);
+
+  let history = useHistory();
   
-  const [imageEror, setImageError] = useState('');
+  const [message, setMessage] = useState('');
   const [open, setOpen] = useState(false);
-  
+  const [registered, setRegistered] = useState(false);
   const {register, handleSubmit} = useForm();
   
   const handleClose = () => {
     // handleclose dialog box 
-    setOpen(false)
+    if (registered === true) {
+      history.push('/signin');
+      // push back to signin link
+    }else{
+      setOpen(false);
+    }
   }
   const classes = useStyles();
   
@@ -47,8 +57,29 @@ const AvatarForm = (props)=>{
       props.prevStep();
   }
 
+  const postRegister = async (data) => {
+    fetch(process.env.REACT_APP_API_USERS, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }).then(response => response.json()).then(result => {
+        console.log(result);
+        setMessage('Register success! now check your email to verifycation.');
+        // succesfully register
+        setRegistered(true);
+        // set registered state
+        setOpen(true)
+        // trigger alert dialog
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
   const handleSubmited = (data) => {
-    setImageError('');
+    setMessage('');
     if (data.profile.length>0) {
       const file = new FormData();
       const imageFile = data.profile[0];
@@ -61,17 +92,31 @@ const AvatarForm = (props)=>{
       }).then(response => response.json()).then(result => {
         // handle image upload error
         if (result.image_error) {
-          setImageError('Image size too large, min 2mb');
+          setMessage('Image size too large, min 2mb');
           // image size too large
           setOpen(true)
           // trigger alert dialog
         }
-        console.log(result);
-      }).catch(err=>console.log(err));
+        props.values.profile_pic = result.fileName
+        // set images filename to props
+        postRegister(props.values);
+        // registered with image
+      }).catch(err=>{
+        setMessage(err);
+        // set error message to user
+        setOpen(true)
+        // trigger alert dialog
+      }
+      );
       //   props.nextStep();
     }else{
-      console.log('no image');
+      postRegister(props.values);
+      // registered without image
     }
+
+    console.log('RESULT DATA', props.values);
+    // register data from props to API
+    
   }
 
   const handleOnchange = (e)=>{
@@ -90,6 +135,9 @@ const AvatarForm = (props)=>{
 
   return (
     <Container component="main" maxWidth="xs">
+  
+      <AlertDialog handleClose={handleClose} open={open} errorMessage={message} />
+
       <CssBaseline />
       <div className={classes.paper}>
 
@@ -133,7 +181,6 @@ const AvatarForm = (props)=>{
           </Grid>
         </form>
       </div>
-      <AlertDialog handleClose={handleClose} open={open} errorMessage={imageEror} />
     </Container>
   );
 }
