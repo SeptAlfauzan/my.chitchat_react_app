@@ -79,12 +79,12 @@ const Login = ()=>{
         </Typography>
         <form onSubmit={handleSubmit((data)=>handleSubmited(data))} className={classes.form} noValidate>
             <small style={{color: 'tomato'}}>{errors.email && errors.email.message}{emailNotRegistered}</small>
-            <TextField
+            <TextField error={errors.email? true : false}
             variant="outlined"
             margin="normal" required fullWidth type="email" id="email" label="Email Address" name="email" autoComplete="email" autoFocus inputRef={register({required: "Email can't be blank", pattern: {value:  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email address"}})}
             />
             <small style={{color: 'tomato'}}>{errors.password && errors.password.message}{passwordError}</small>
-            <TextField
+            <TextField error={errors.password? true : false}
             variant="outlined" margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" inputRef={register({required: "password can't be blank", minLength: {value: 8, message: "Password too short, min 8 letter"}})}
           />
           <FormControlLabel

@@ -56,12 +56,24 @@ const MainForm = (props)=>{
     }
   }
 
+  const setValueInput = (data) => {
+    setFirstName(data.firstName);
+    setLastName(data.lastName);
+    setEmail(data.email);
+    setUsername(data.username);
+    setPassword(data.password);
+  }
+
   const handleSubmited = (data) => {
     if (emailValid) {
       console.log(data);
       data.picture = 'gambar.jpg';
       console.log(data);
+      
+      setValueInput(data);
+      // set value to state, prevent losing all value when user click go back button in next form
       props.nextStep();
+      // move to next form
     }
   }
 
@@ -79,12 +91,12 @@ const MainForm = (props)=>{
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <small style={{color: 'tomato'}}>{errors.firstName && errors.firstName.message}</small>
-              <TextField value={firstname} inputRef={register({ required: "First name can't be blank" })} required autoComplete="fname" name="firstName" variant="outlined" required fullWidth id="firstName" label="First Name" autoFocus
+              <TextField error={errors.firstName? true: false} inputRef={register({ required: "First name can't be blank" })} required autoComplete="fname" name="firstName" variant="outlined" required fullWidth id="firstName" label="First Name" autoFocus
               />
               </Grid>
             <Grid item xs={12} sm={6}>
               <small style={{color: 'tomato'}}>{errors.lastName && errors.lastName.message}</small>
-              <TextField value={lastName} inputRef={register({required: "Last name can't be blank"})}
+              <TextField error={errors.lastName? true : false} inputRef={register({required: "Last name can't be blank"})}
                 variant="outlined"
                 required
                 fullWidth
@@ -96,7 +108,7 @@ const MainForm = (props)=>{
             </Grid>
             <Grid item xs={12}>
               <small style={{color: 'tomato'}}>{errors.email && errors.email.message}{emailUsedErr}</small>
-              <TextField value={email} onChange={handleChangeEmail} inputRef={register({required: "Email can't be blank", pattern: {value:  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email address"}})}
+              <TextField error={errors.email? true : false} onChange={handleChangeEmail} inputRef={register({required: "Email can't be blank", pattern: {value:  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email address"}})}
                 variant="outlined"
                 required
                 fullWidth
@@ -108,11 +120,11 @@ const MainForm = (props)=>{
             </Grid>
             <Grid item xs={12}>
               <small style={{color: 'tomato'}}>{errors.username && errors.username.message}</small>              
-              <TextField value={username} inputRef={register({required: "Username can't be blank", pattern: {value: ['1', '2', 'a'], message: "Username already taken" }})} variant="outlined" required fullWidth id="username" label="Username" name="username" autoComplete="username" />
+              <TextField error={errors.username? true : false} inputRef={register({required: "Username can't be blank", pattern: {value: ['1', '2', 'a'], message: "Username already taken" }})} variant="outlined" required fullWidth id="username" label="Username" name="username" autoComplete="username" />
             </Grid>
             <Grid item xs={12}>              
               <small style={{color: 'tomato'}}>{errors.password && errors.password.message}</small>
-              <TextField value={password} inputRef={register({required: "Password can't be blank", minLength: {value: 8, message: "Your password is to short, min 8 letter"}})} variant="outlined" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password"
+              <TextField error={errors.password? true : false} inputRef={register({required: "Password can't be blank", minLength: {value: 8, message: "Your password is to short, min 8 letter"}})} variant="outlined" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password"
               />
             </Grid>
           </Grid>
