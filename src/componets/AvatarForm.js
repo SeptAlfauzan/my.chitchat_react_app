@@ -120,14 +120,19 @@ const AvatarForm = (props)=>{
   }
 
   const handleOnchange = (e)=>{
+    // handle button upload image
     if(e.target.files[0] !== undefined){
       console.log(e.target.files[0]);
       const imageUrl = window.URL.createObjectURL(e.target.files[0]);
+      // convert image file to url
       const addImageIcon = document.getElementById('icon-picture');
       const imageContainer = document.getElementById('output');
       addImageIcon.classList.add('hidden');
+      // hide image upload icon
       imageContainer.classList.remove('hidden');
+      // unhide image upload icon
       imageContainer.src = imageUrl;
+      // set image src from picture that uploaded
     }
   }
 
